@@ -27,7 +27,7 @@
       this.shadow()
       setTimeout(() => {
         this.$router.push({
-          name: 'home'
+          name: 'search'
         })
       }, 4000)
     }
