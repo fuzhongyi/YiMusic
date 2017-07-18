@@ -6,10 +6,10 @@
       </div>
       <div class="text">音乐菜单</div>
       <div class="content">
-        <input type="text" placeholder="输入你所需要查找的歌曲">
+        <input type="text" placeholder="输入你所需要查找的歌曲" v-model="searchKey" @blur="searchMusic">
       </div>
     </div>
-    <music-list></music-list>
+    <music-list :songs="songs"></music-list>
   </div>
 </template>
 
@@ -18,6 +18,31 @@
   import musicList from '@/components/musicList'
 
   export default {
+    data () {
+      return {
+        searchKey: '',
+        songs: []
+      }
+    },
+    methods: {
+      searchMusic () {
+        this.$http.jsonp('http://tingapi.ting.baidu.com/v1/restserver/ting?method=baidu.ting.search.catalogSug&query=' + this.searchKey, {jsonp: 'callback'}).then((res) => {
+          var songList = res.body.song
+          for (let item of songList) {
+            let song = {}
+            this.$http.jsonp('http://tingapi.ting.baidu.com/v1/restserver/ting?method=baidu.ting.song.play&songid=' + item.songid, {jsonp: 'callback'}).then((res) => {
+              song.mp3 = res.body.bitrate.show_link
+              song.img = res.body.songinfo.pic_big
+              song.name = item.songname
+              song.singer = item.artistname
+              song.album = song.title + '.mp3'
+              song.thumbs = Math.round(Math.random() * 3000)
+              this.songs.push(song)
+            })
+          }
+        })
+      }
+    },
     components: {
       back,
       musicList
@@ -51,6 +76,7 @@
           border-radius: 20px
           outline: none
           background: transparent
+          color: #fff
           &::placeholder
             color: rgba(255, 255, 255, 0.5)
 </style>
