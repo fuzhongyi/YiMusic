@@ -1,8 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import index from '@/views/index'
-import home from '@/views/home'
-import search from '@/views/search'
 
 Vue.use(Router)
 
@@ -10,17 +7,30 @@ const routes = [
   {
     path: '/',
     name: 'index',
-    component: index
+    component: function (resolve) {
+      require(['@/views/index'], resolve)
+    }
   },
   {
     path: '/home',
     name: 'home',
-    component: home
+    component: function (resolve) {
+      require(['@/views/home'], resolve)
+    }
   },
   {
     path: '/search',
     name: 'search',
-    component: search
+    component: function (resolve) {
+      require(['@/views/search'], resolve)
+    }
+  },
+  {
+    path: '/play',
+    name: 'play',
+    component: function (resolve) {
+      require(['@/views/play'], resolve)
+    }
   }
 ]
 

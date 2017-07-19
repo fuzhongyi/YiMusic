@@ -9,7 +9,7 @@
         <input type="text" placeholder="输入你所需要查找的歌曲" v-model="searchKey" @blur="searchMusic">
       </div>
     </div>
-    <music-list :songs="songs"></music-list>
+    <music-list></music-list>
   </div>
 </template>
 
@@ -20,25 +20,19 @@
   export default {
     data () {
       return {
-        searchKey: '',
-        songs: []
+        searchKey: ''
       }
     },
     methods: {
       searchMusic () {
+        this.$store.commit('songsInit')
+        this.$store.commit('updateLoadingStatus', {isLoading: true})
         this.$http.jsonp('http://tingapi.ting.baidu.com/v1/restserver/ting?method=baidu.ting.search.catalogSug&query=' + this.searchKey, {jsonp: 'callback'}).then((res) => {
+          this.$store.commit('updateLoadingStatus', {isLoading: false})
           var songList = res.body.song
-          for (let item of songList) {
-            let song = {}
-            this.$http.jsonp('http://tingapi.ting.baidu.com/v1/restserver/ting?method=baidu.ting.song.play&songid=' + item.songid, {jsonp: 'callback'}).then((res) => {
-              song.mp3 = res.body.bitrate.show_link
-              song.img = res.body.songinfo.pic_big
-              song.name = item.songname
-              song.singer = item.artistname
-              song.album = song.title + '.mp3'
-              song.thumbs = Math.round(Math.random() * 3000)
-              this.songs.push(song)
-            })
+          for (let song of songList) {
+            song.thumbs = Math.round(Math.random() * 3000)
+            this.$store.commit('songsAdd', song)
           }
         })
       }
