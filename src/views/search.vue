@@ -14,7 +14,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import back from '@/components/back'
+  import Back from '@/components/back'
   import musicList from '@/components/musicList'
 
   export default {
@@ -27,18 +27,22 @@
       searchMusic () {
         this.$store.commit('songsInit')
         this.$store.commit('updateLoadingStatus', {isLoading: true})
-        this.$http.jsonp('http://tingapi.ting.baidu.com/v1/restserver/ting?method=baidu.ting.search.catalogSug&query=' + this.searchKey, {jsonp: 'callback'}).then((res) => {
+        this.axios.post(this.api.music.search + this.searchKey).then((res) => {
           this.$store.commit('updateLoadingStatus', {isLoading: false})
-          var songList = res.body.song
-          for (let song of songList) {
-            song.thumbs = Math.round(Math.random() * 3000)
-            this.$store.commit('songsAdd', song)
+          if (res.data.code === 200) {
+            var songList = res.data.result.songs
+            for (let song of songList) {
+              song.thumbs = Math.round(Math.random() * 3000)
+              this.$store.commit('songsAdd', song)
+            }
           }
+        }).catch(function () {
+          console.log('请求接口失败！')
         })
       }
     },
     components: {
-      back,
+      Back,
       musicList
     }
   }
