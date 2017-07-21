@@ -4,7 +4,7 @@
       <swipeout>
         <template v-for="song,index in getSongs">
           <swipeout-item transition-mode="reveal" :style="{'background': index%2!=0?'#F1F0F6':''}"
-                         @click.native="toPlay(song)">
+                         @click.native="toPlay(index)">
             <div slot="right-menu">
               <swipeout-button background-color="#59E3B0" @click.stop.native="thumbsUp(index)">
                 <i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i>
@@ -38,10 +38,10 @@
 
   export default {
     methods: {
-      toPlay (song) {
+      toPlay (index) {
         this.$router.push({
           name: 'play',
-          params: song
+          params: {'index': index}
         })
       },
       thumbsUp (index) {

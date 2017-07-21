@@ -37,7 +37,7 @@
             }
           }
         }).catch(function () {
-          console.log('请求接口失败！')
+          this.$vux.toast.text('请求接口失败~~', 'middle')
         })
       }
     },
