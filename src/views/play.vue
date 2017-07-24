@@ -1,11 +1,12 @@
 <template>
-  <div class="play">
+  <div class="play" ref="play">
     <blur :blur-amount="12" :url="song.al.picUrl" :height="height">
       <back :size="'1.5rem'"></back>
       <div class="name">
+        <inline-loading v-show="isLoading"></inline-loading>
         <span class="text">{{song.name }}</span>
       </div>
-      <swiper :loop="true" :dots-position="'center'" :height="'60vh'">
+      <swiper :loop="true" :dots-position="'center'" :height="'65vh'">
         <swiper-item>
           <div class="singer">
             <span class="line"></span>
@@ -16,20 +17,25 @@
             <span class="text">{{ song.al.name }}</span>
           </div>
           <div class="img">
-            <img :src="song.al.picUrl" @click="showPic(0)" :class="isPlaying?'playing':''"/>
+            <img :src="song.al.picUrl" @click="showPic(0)" class="playing" :class="isPlaying?'':'paused'"/>
           </div>
           <div class="lyric">为你我用了半年的积蓄</div>
         </swiper-item>
-        <swiper-item>歌词</swiper-item>
+        <swiper-item>
+          <p v-for="data,index in lyric">
+            {{data[1]}}
+          </p>
+        </swiper-item>
       </swiper>
-      <div class="progress">
-        <range :value="progress"
-               :minHtml="'00:00'"
-               :maxHtml="'00:00'"
-               :rangeBarHeight="3">
-        </range>
-      </div>
       <div class="controls">
+        <div class="progress">
+          <range :value="progress"
+                 :rangeBarHeight="3"
+                 :minHtml="'00:00'"
+                 :maxHtml="'00:00'"
+                 @on-change="customTime">
+          </range>
+        </div>
         <div class="pre btn" @click="preSong">
           <i class="fa fa-step-backward"></i>
         </div>
@@ -40,7 +46,7 @@
           <i class="fa fa-step-forward"></i>
         </div>
       </div>
-      <audio autoplay loop :src="mp3.url" ref="audio">
+      <audio autoplay loop ref="audio">
       </audio>
       <div v-transfer-dom>
         <previewer :list="[{src:song.al.picUrl}]" ref="previewer"></previewer>
@@ -51,8 +57,9 @@
 
 <script type="text/ecmascript-6">
   import Back from '@/components/back'
-  import {Blur, Previewer, Swiper, SwiperItem, TransferDom, Range} from 'vux'
-  import {cutAr, formatSeconds} from '@/assets/js/filters'
+  import {Blur, Previewer, Swiper, SwiperItem, TransferDom, Range, InlineLoading} from 'vux'
+  import {cutAr} from '@/assets/js/filters'
+  import util from '@/assets/js/util'
 
   export default {
     directives: {
@@ -61,12 +68,13 @@
     data () {
       return {
         index: 0,
-        isPlaying: true,
-        song: {},
-        mp3: {url: null},
-        height: window.screen.availHeight,
-        progress: 0,
-        timer: null
+        isLoading: false, // 是否加载
+        isPlaying: true,  // 是否播放中
+        song: {},         // 当前歌曲信息
+        mp3: {url: null}, // MP3来源
+        lyric: '',        // 歌词
+        height: 0,        // 窗口高度
+        progress: 0       // 播放进度
       }
     },
     methods: {
@@ -96,47 +104,103 @@
           audio.pause()
         }
       },
+      customTime (val) {
+        if (!this.isPlaying) {
+          let $audio = this.$refs.audio
+          let current = val / 100 * $audio.duration
+          $audio.currentTime = current
+        }
+      },
       showPic (index) {
         this.$refs.previewer.show(index)
       },
       songDetail () {
-        this.song = this.$store.state.songs.songs[this.index]
-        let id = this.song.id
-        this.$store.commit('updateLoadingStatus', {isLoading: true})
-        this.axios.get(this.api.music.detail, {params: {'id': id}}).then((res) => {
-          this.$store.commit('updateLoadingStatus', {isLoading: false})
+        let vm = this
+        vm.song = vm.$store.state.songs.songs[vm.index]
+        let id = vm.song.id
+        vm.isLoading = true
+        vm.axios.get(vm.api.music.detail, {params: {id}}).then((res) => {
+          vm.isLoading = false
           if (res.data.status.code === 200) {
-            this.mp3 = res.data.data.mp3
-            if (!this.timer) {
-              this.updateProgress()
-            }
+            vm.mp3 = res.data.data.mp3
+            let $audio = vm.$refs.audio
+            $audio.src = vm.mp3.url
+            let timer = setInterval(() => {
+              if ($audio.duration) {
+                vm.updateProgress()
+                clearInterval(timer)
+              }
+            }, 300)
           }
-        }).catch(function () {
+        }).catch(() => {
           this.$vux.toast.text('请求接口失败~~', 'middle')
         })
       },
+      songLyric () {
+        let id = this.song.id
+        this.axios.get(this.api.music.lyric, {
+          params: {
+            id,
+            'lv': -1,
+            'kv': -1,
+            'tv': -1
+          }
+        }).then((res) => {
+          if (res.data.code === 200) {
+            if (res.data.hasOwnProperty('lrc')) {
+              this.lyric = util.lyricArr(res.data.lrc.lyric)
+            } else {
+              this.lyric = '暂无歌词'
+            }
+          }
+        })
+      },
       updateProgress () {
-        let audio = this.$refs.audio
-        this.timer = setInterval(() => {
-          let duration = audio.duration
-          if (duration) {
-            let current = audio.currentTime
-            let min = document.getElementsByClassName('range-min')[0]
-            let max = document.getElementsByClassName('range-max')[0]
-            min.innerHTML = formatSeconds(Math.round(current))
-            max.innerHTML = formatSeconds(Math.round(duration))
+        let $audio = this.$refs.audio
+        let duration = $audio.duration
+        let min = document.getElementsByClassName('range-min')[0]
+        let max = document.getElementsByClassName('range-max')[0]
+        max.innerHTML = util.formatTime(duration)
+        let timer = setInterval(() => {
+          if ($audio.paused) {
+            clearInterval(timer)
+          } else {
+            let current = $audio.currentTime
+            min.innerHTML = util.formatTime(current)
             this.progress = current / duration * 100
           }
-        }, 1000)
+        }, 300)
       }
     },
     created () {
       this.index = this.$route.params.index
       this.songDetail()
+      this.songLyric()
+    },
+    mounted () {
+      let vm = this
+      vm.height = vm.$refs.play.offsetHeight
+      let $audio = vm.$refs.audio
+      vm.$nextTick(() => {
+        let $progress = document.getElementsByClassName('progress')[0]
+        let $rangeHandle = $progress.getElementsByClassName('range-handle')[0]
+        $rangeHandle.addEventListener('touchstart', function () {
+          if (!$audio.paused) {
+            vm.isPlaying = false
+            $audio.pause()
+          }
+        })
+        $rangeHandle.addEventListener('touchend', () => {
+          setTimeout(() => {
+            vm.isPlaying = true
+            vm.updateProgress()
+            $audio.play()
+          }, 300)
+        })
+      })
     },
     filters: {
-      cutAr,
-      formatSeconds
+      cutAr
     },
     components: {
       Range,
@@ -144,7 +208,8 @@
       Back,
       Previewer,
       Swiper,
-      SwiperItem
+      SwiperItem,
+      InlineLoading
     }
   }
 </script>
@@ -153,6 +218,9 @@
   $skin = #56e3af
 
   .play
+    position: absolute
+    width: 100%
+    height: 100%
     background: rgba(7, 17, 27, 0.3)
     color: #fff
     .vux-icon-dot.active
@@ -165,13 +233,16 @@
       padding: 20px 24px
       font-size: 1.1rem
       line-height: 1.2
+      text-align: center
+      .weui-loading
+        vertical-align: top
       .text
-        display: block
+        display: inline-block
         margin: 0 auto
         max-width: 200px
-        text-align: center
-    .singer
+    .vux-slider
       text-align: center
+    .singer
       .line
         display: inline-block
         position: relative
@@ -190,7 +261,9 @@
         font-size: 0.7rem
         line-height: 0.7rem
     .lyric
-      margin-top: 10px
+      position: absolute
+      bottom: 30px
+      width: 100%
       font-size: 0.9rem
       text-align: center
       color: $skin
@@ -205,27 +278,31 @@
           width: 60vw
           height: 60vw
         &.playing
-          animation: 30s rotate infinite linear forwards
-    .progress
-      height: 30px
-      .vux-range-input-box
-        margin-right: 50px !important
-        .range-handle
-          top: -5.5px !important
-          width: 15px
-          height: 15px
-          background-color: $skin
-        .range-min
-          left: -40px
-          color: #fff
-        .range-max
-          right: -35px
-          color: #fff
-        .range-quantity
-          background-color: $skin
+          animation: 30s rotate linear forwards infinite
+        &.paused
+          animation-play-state: paused
     .controls
-      height: 100px
+      position: absolute
+      bottom: 30px
+      width: 100%
       text-align: center
+      .progress
+        margin-bottom: 24px
+        .vux-range-input-box
+          margin-right: 50px !important
+          .range-handle
+            top: -5.5px !important
+            width: 15px
+            height: 15px
+            background-color: $skin
+          .range-min
+            left: -40px
+            color: #fff
+          .range-max
+            right: -35px
+            color: #fff
+          .range-quantity
+            background-color: $skin
       .btn
         display: inline-flex
         padding: 8px
