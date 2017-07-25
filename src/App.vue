@@ -9,7 +9,7 @@
 
 <script>
   import Loading from '@/components/loading'
-
+  import 'animate.css'
   export default {
     components: {
       Loading
@@ -21,6 +21,7 @@
 <style lang="stylus" rel="stylesheet/stylus">
   @import './assets/stylus/common/reset.stylus'
   @import './assets/stylus/index.styl'
+  @import '../node_modules/font-awesome/css/font-awesome.min.css'
 
   .slide-left-enter-active, .slide-left-leave-active
     transition: transform .5s

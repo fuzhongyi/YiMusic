@@ -49,7 +49,6 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
-  @import '../../node_modules/font-awesome/css/font-awesome.min.css'
 
   .search
     .search-header

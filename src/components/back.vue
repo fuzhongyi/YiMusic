@@ -19,8 +19,7 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
-  @import '../../node_modules/font-awesome/css/font-awesome.min.css'
-
   .back
+    z-index: 999
     color: rgba(255, 255, 255, 0.8)
 </style>
