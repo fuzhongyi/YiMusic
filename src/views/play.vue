@@ -4,7 +4,7 @@
       <back :size="'1.5rem'"></back>
       <div class="name animated bounceInDown">
         <inline-loading v-show="isLoading"></inline-loading>
-        <span class="text">{{song.name }}</span>
+        <span class="text" :class="{small:song.name.length>12,smaller:song.name.length>22}">{{song.name}}</span>
       </div>
       <swiper :loop="true" :dots-position="'center'" :height="'65vh'" @on-index-change="swiperChange">
         <swiper-item>
@@ -20,12 +20,16 @@
             <img :src="song.al.picUrl" @click="showPic(0)" class="playing" :class="{paused:!isPlaying}"/>
           </div>
           <div class="lyric">
+            {{isLoading ? '歌词加载中...' : ''}}
+            {{lyric instanceof Array ? '' : (isLoading ? '' : lyric)}}
             {{lyricIndex === -1 ? '' : lyric[lyricIndex === undefined ? lyric.length - 1 : lyricIndex][1]}}
           </div>
         </swiper-item>
         <swiper-item>
           <div class="lyric-all">
             <p v-for="i in 6"></p>
+            {{isLoading ? '歌词加载中...' : ''}}
+            {{lyric instanceof Array ? '' : (isLoading ? '' : lyric)}}
             <p v-for="data,index in lyric" :class="{on:index==(lyricIndex===undefined?lyric.length-1:lyricIndex)}"
                @click="changeTime(data[0])">
               {{data[1]}}</p>
@@ -52,8 +56,7 @@
           <i class="fa fa-step-forward"></i>
         </div>
       </div>
-      <audio autoplay loop ref="audio">
-      </audio>
+      <audio ref="audio"></audio>
       <div v-transfer-dom>
         <previewer :list="[{src:song.al.picUrl}]" ref="previewer"></previewer>
       </div>
@@ -67,6 +70,7 @@
   import {cutAr} from '@/assets/js/filters'
   import util from '@/assets/js/util'
   import $ from 'jquery'
+  import _ from 'underscore'
 
   export default {
     directives: {
@@ -75,12 +79,12 @@
     data () {
       return {
         index: 0,         // 当前播放歌曲下标
-        isLoading: false, // 是否加载
-        isPlaying: true,  // 是否播放中
+        isLoading: true,  // 是否加载
+        isPlaying: false,  // 是否播放中
         isOnHold: true,   // 是否按住歌词
         song: {},         // 当前歌曲信息
         mp3: {url: null}, // MP3来源
-        lyric: [],        // 歌词
+        lyric: '暂无歌词', // 歌词
         height: 0,        // 窗口高度
         progress: 0,      // 播放进度
         current: 0,       // 当前时间
@@ -111,7 +115,7 @@
       },
       nextSong () {
         if (this.index === this.$store.state.songs.songs.length - 1) {
-          this.$vux.toast.text('已经是最后一首啦~~', 'top')
+          this.$vux.toast.text('已经是最后一首啦~', 'top')
           return
         }
         this.index += 1
@@ -119,6 +123,11 @@
       },
       togglePlay () {
         let $audio = this.$refs.audio
+        if ($audio.src.indexOf('null') !== -1) {
+          this.isPlaying = false
+          this.$vux.toast.text('sorry,暂未相关资源~', 'top')
+          return
+        }
         if ($audio.paused) {
           this.isPlaying = true
           this.isOnHold = false
@@ -131,7 +140,7 @@
         }
       },
       customTime (val) {
-        if (!this.isPlaying) {
+        if (!this.isPlaying && this.mp3.url !== null) {
           let $audio = this.$refs.audio
           let current = val / 100 * $audio.duration
           $audio.currentTime = current
@@ -151,6 +160,7 @@
       songDetail () {
         const vm = this
         vm.song = vm.$store.state.songs.songs[vm.index]
+        vm.songLyric()
         let id = vm.song.id
         vm.isLoading = true
         vm.axios.get(vm.api.music.detail, {params: {id}}).then((res) => {
@@ -159,13 +169,21 @@
             vm.mp3 = res.data.data.mp3
             let $audio = vm.$refs.audio
             $audio.src = vm.mp3.url
+            vm.togglePlay()
             let timer = setInterval(() => {
               if ($audio.duration) {
                 vm.duration = parseInt($audio.duration)
                 let max = document.getElementsByClassName('range-max')[0]
+                let min = document.getElementsByClassName('range-min')[0]
+                max.innerHTML = '00:00'
+                min.innerHTML = '00:00'
+                if (_.isUndefined(max)) {
+                  clearInterval(timer)
+                  return
+                }
                 max.innerHTML = util.formatTime(vm.duration)
-                vm.updateProgress()
                 clearInterval(timer)
+                vm.updateProgress()
               }
             }, 300)
           }
@@ -192,18 +210,17 @@
           }
         }).catch(() => {
           this.lyric = '暂无歌词'
-          this.$vux.toast.text('请求接口失败~~', 'middle')
         })
       },
       lyricRoll () {
         const vm = this
         let $audio = this.$refs.audio
         let timer = setInterval(() => {
-          if (vm.isOnHold || $audio.paused) {
+          let on = $('.lyric-all p.on')
+          if (vm.isOnHold || $audio.paused || on.length === 0) {
             clearInterval(timer)
             return
           }
-          let on = $('.lyric-all p.on')
           let top = on.parent().scrollTop() - (on.parent().offset().top - on.offset().top) - on.parent().height() / 2
           on.parent().animate({
             scrollTop: top
@@ -215,7 +232,10 @@
         let $audio = vm.$refs.audio
         let min = document.getElementsByClassName('range-min')[0]
         let timer = setInterval(() => {
-          if ($audio.paused) {
+          if (_.isUndefined($audio) || $audio.ended) {
+            clearInterval(timer)
+            vm.nextSong()
+          } else if (_.isUndefined($audio) || $audio.paused) {
             clearInterval(timer)
           } else {
             vm.current = parseInt($audio.currentTime)
@@ -234,7 +254,6 @@
     created () {
       this.index = this.$route.params.index
       this.songDetail()
-      this.songLyric()
     },
     mounted () {
       const vm = this
@@ -297,6 +316,12 @@
         display: inline-block
         margin: 0 auto
         max-width: 200px
+        max-height: 35px
+        overflow: hidden
+        &.small
+          font-size: 1rem
+        &.smaller
+          font-size: 0.5rem
     .vux-slider
       text-align: center
     .singer
@@ -312,11 +337,16 @@
       text-align: center
       padding: 20px
       .text
-        padding: 1px 6px
-        border: 2px solid rgba(255, 255, 255, 0.5)
-        border-radius: 5px
+        display: inline-block
+        padding: 2px 6px
+        max-width: 220px
+        overflow: hidden
+        text-overflow: ellipsis
         font-size: 0.7rem
         line-height: 0.7rem
+        border: 2px solid rgba(255, 255, 255, 0.5)
+        border-radius: 5px
+        white-space: nowrap
     .lyric
       position: absolute
       bottom: 30px
@@ -327,6 +357,8 @@
     .lyric-all
       height: calc(100% - 30px)
       overflow: auto
+      &::-webkit-scrollbar
+        display: none
       p
         padding: 10px 0
         font-size: 0.8rem

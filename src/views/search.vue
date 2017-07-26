@@ -6,7 +6,7 @@
       </div>
       <div class="text">音乐菜单</div>
       <div class="content">
-        <input type="text" placeholder="输入你所需要查找的歌曲" v-model="searchKey" @blur="searchMusic">
+        <input type="text" placeholder="输入你所需要查找的歌曲" v-model="searchKey" @keyup="searchMusic">
       </div>
     </div>
     <music-list></music-list>
@@ -16,15 +16,17 @@
 <script type="text/ecmascript-6">
   import Back from '@/components/back'
   import musicList from '@/components/musicList'
+  import _ from 'underscore'
 
   export default {
     data () {
       return {
-        searchKey: ''
+        searchKey: '',
+        search: null
       }
     },
     methods: {
-      searchMusic () {
+      getMusic () {
         this.$store.commit('songsInit')
         this.$store.commit('updateLoadingStatus', {isLoading: true})
         this.axios.post(this.api.music.search + this.searchKey).then((res) => {
@@ -39,6 +41,12 @@
         }).catch(function () {
           this.$vux.toast.text('请求接口失败~~', 'middle')
         })
+      },
+      searchMusic () {
+        if (this.search === null) {
+          this.search = _.debounce(this.getMusic, 300)
+        }
+        this.search()
       }
     },
     components: {
