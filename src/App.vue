@@ -13,8 +13,7 @@
   export default {
     components: {
       Loading
-    },
-    name: 'app'
+    }
   }
 </script>
 
