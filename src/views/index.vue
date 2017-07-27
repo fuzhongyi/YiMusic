@@ -20,7 +20,8 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
-  $skin = #77b6ad
+  @import '../assets/stylus/comm.styl'
+
   $textShadow = 0px 0px lighten($skin, 20)
   for n in 1...100
     $textShadow = $textShadow\,(n * 1.2)px (n - 0.5)px lighten($skin, 20)

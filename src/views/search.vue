@@ -9,14 +9,19 @@
         <input type="text" placeholder="输入你所需要查找的歌曲" v-model="searchKey" @keyup="searchMusic">
       </div>
     </div>
-    <music-list></music-list>
+    <scroller height="-137" lock-x :bounce="false" ref="scroller">
+      <div>
+        <music-list></music-list>
+      </div>
+    </scroller>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import Back from '@/components/back'
-  import musicList from '@/components/musicList'
+  import MusicList from '@/components/musicList'
   import _ from 'underscore'
+  import {Scroller} from 'vux'
 
   export default {
     data () {
@@ -24,6 +29,11 @@
         searchKey: '',
         search: null
       }
+    },
+    components: {
+      Back,
+      MusicList,
+      Scroller
     },
     methods: {
       getMusic () {
@@ -38,6 +48,9 @@
               this.$store.commit('songsAdd', song)
             }
           }
+          this.$nextTick(() => {
+            this.$refs.scroller.reset()
+          })
         }).catch(function () {
           this.$vux.toast.text('请求接口失败~~', 'middle')
         })
@@ -48,20 +61,17 @@
         }
         this.search()
       }
-    },
-    components: {
-      Back,
-      musicList
     }
   }
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
+  @import '../assets/stylus/comm.styl'
 
   .search
     .search-header
       padding: 18px 24px
-      background: #77b6ad
+      background: $skin
       .back-off
         margin-bottom: 4px
       .text
