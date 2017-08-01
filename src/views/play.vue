@@ -221,7 +221,7 @@
             clearInterval(timer)
             return
           }
-          let top = on.parent().scrollTop() - (on.parent().offset().top - on.offset().top) - on.parent().height() / 2
+          let top = on.parent().scrollTop() - (on.parent().offset().top - on.offset().top) - on.parent().height() / 3
           on.parent().animate({
             scrollTop: top
           })
