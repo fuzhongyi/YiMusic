@@ -11,6 +11,12 @@
     </div>
     <scroller height="-137" lock-x :bounce="false" ref="scroller">
       <div>
+        <transition enter-active-class="animated bounceIn">
+          <p class="inline-loading" v-show="isLoading">
+            <inline-loading></inline-loading>
+            <span class="text">数据加载中...</span>
+          </p>
+        </transition>
         <music-list></music-list>
       </div>
     </scroller>
@@ -21,26 +27,31 @@
   import Back from '@/components/back'
   import MusicList from '@/components/musicList'
   import _ from 'underscore'
-  import {Scroller} from 'vux'
+  import {Scroller, InlineLoading} from 'vux'
 
   export default {
     data () {
       return {
         searchKey: '',
-        search: null
+        search: null,
+        isLoading: false
       }
     },
     components: {
       Back,
       MusicList,
-      Scroller
+      Scroller,
+      InlineLoading
     },
     methods: {
       getMusic () {
+        if (this.searchKey.length === 0) {
+          return
+        }
         this.$store.commit('songsInit')
-        this.$store.commit('updateLoadingStatus', {isLoading: true})
+        this.isLoading = true
         this.axios.post(this.api.music.search + this.searchKey).then((res) => {
-          this.$store.commit('updateLoadingStatus', {isLoading: false})
+          this.isLoading = false
           if (res.data.code === 200) {
             var songList = res.data.result.songs
             for (let song of songList) {
@@ -94,4 +105,12 @@
           color: #fff
           &::placeholder
             color: rgba(255, 255, 255, 0.5)
+    .inline-loading
+      margin-top: 5px
+      text-align: center
+      .text
+        vertical-align: bottom
+        font-size: 0.8rem
+        line-height: 20px
+        color: rgba(7, 17, 27, 0.8)
 </style>
