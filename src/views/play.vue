@@ -144,8 +144,16 @@
           let $audio = this.$refs.audio
           let current = val / 100 * $audio.duration
           $audio.currentTime = current
+          this.current = current
           let min = document.getElementsByClassName('range-min')[0]
           min.innerHTML = util.formatTime(parseInt(current))
+          this.$nextTick(() => {
+            let on = $('.lyric-all p.on')
+            let top = on.parent().scrollTop() - (on.parent().offset().top - on.offset().top) - on.parent().height() / 3
+            on.parent().animate({
+              scrollTop: top
+            }, 10)
+          })
         }
       },
       changeTime (time) {
@@ -175,12 +183,12 @@
                 vm.duration = parseInt($audio.duration)
                 let max = document.getElementsByClassName('range-max')[0]
                 let min = document.getElementsByClassName('range-min')[0]
-                max.innerHTML = '00:00'
-                min.innerHTML = '00:00'
-                if (_.isUndefined(max)) {
+                if (_.isUndefined(max) || _.isUndefined(min)) {
                   clearInterval(timer)
                   return
                 }
+                max.innerHTML = '00:00'
+                min.innerHTML = '00:00'
                 max.innerHTML = util.formatTime(vm.duration)
                 clearInterval(timer)
                 vm.updateProgress()
@@ -193,6 +201,7 @@
       },
       songLyric () {
         let id = this.song.id
+        this.lyric = '暂无歌词'
         this.axios.get(this.api.music.lyric, {
           params: {
             id,
@@ -225,7 +234,7 @@
           on.parent().animate({
             scrollTop: top
           })
-        }, 3000)
+        }, 300)
       },
       updateProgress () {
         const vm = this
@@ -417,6 +426,9 @@
           width: 12vw
           height: 12vw
           font-size: 1.5rem
+          .fa-play
+            position: relative
+            left: 3px
 
   @keyframes rotate
     from

@@ -2,15 +2,15 @@
   <div class="music-list">
     <ul class="music-wrapper">
       <swipeout>
-        <template v-for="song,index in getSongs">
+        <transition-group enter-active-class="animated bounceIn">
           <swipeout-item transition-mode="reveal" :style="{'background': index%2!=0?'#F1F0F6':''}"
-                         @click.native="toPlay(index)">
+                         @click.native="toPlay(index)" v-for="song,index in getSongs" :key="index">
             <div slot="right-menu">
               <swipeout-button background-color="#59E3B0" @click.stop.native="thumbsUp(index)">
                 <i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i>
               </swipeout-button>
             </div>
-            <div slot="content" class="demo-content vux-1px-t">
+            <div slot="content">
               <li class="song-list" :style="{'background': index%2!=0?'#F1F0F6':''}">
                 <div class="order">{{index + 1}}
                 </div>
@@ -25,7 +25,7 @@
               </li>
             </div>
           </swipeout-item>
-        </template>
+        </transition-group>
       </swipeout>
     </ul>
   </div>
@@ -90,6 +90,7 @@
             white-space: nowrap
             text-overflow: ellipsis
             margin: 15px auto 15px 0
+            line-height: 1.1
             @media only screen and (max-width: 320px)
               max-width: 180px
           .singer
@@ -98,6 +99,7 @@
             overflow: hidden
             white-space: nowrap
             text-overflow: ellipsis
+            line-height: 1.1
             color: rgba(7, 17, 27, 0.5)
             @media only screen and (max-width: 320px)
               max-width: 150px

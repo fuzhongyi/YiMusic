@@ -23,6 +23,11 @@
   }
 </script>
 
+<style lang="less" rel="stylesheet/less">
+  @import '../node_modules/vux/src/styles/1px.less';
+  @import '../node_modules/vux/src/styles/close.less';
+</style>
+
 <style lang="stylus" rel="stylesheet/stylus">
   @import './assets/stylus/comm.styl'
   @import '../node_modules/font-awesome/css/font-awesome.min.css'
