@@ -1,16 +1,17 @@
 <template>
   <div class="search">
-    <div class="search-header">
-      <div class="back-off">
-        <back :size="'1.5rem'"></back>
-      </div>
-      <div class="text">音乐菜单</div>
+    <div class="search-header" :style="{height:searchKey.length?'34px':'101px'}">
+      <transition
+        enter-active-class="animated bounceIn"
+        leave-active-class="animated bounceOut">
+        <div class="text" v-show="searchKey.length===0">音乐菜单</div>
+      </transition>
       <div class="content">
         <input type="text" placeholder="输入你所需要查找的歌曲"
                v-model="searchKey" @keyup="searchMusic" ref="search">
       </div>
     </div>
-    <scroller height="-137" lock-x :bounce="false" ref="scroller">
+    <scroller :height="searchKey.length?'-70':'-137'" lock-x :bounce="false" ref="scroller">
       <div>
         <transition enter-active-class="animated bounceIn">
           <p class="inline-loading" v-show="isLoading">
@@ -18,17 +19,22 @@
             <span class="text">正在加载</span>
           </p>
         </transition>
-        <div class="history">
+        <div class="history" v-show="searchKey.length===0">
           <ul class="history-wrapper">
-            <li class="history-item vux-1px-b" v-for="item in history">
+            <li class="history-item vux-1px-b"
+                v-for="item,index in history"
+                :key="index"
+                @click="chooseHistory(item)">
               <i class="fa fa-history"></i>
               <span class="text">{{item}}</span>
-              <i class="close fa fa-times"></i>
+              <i class="close fa fa-times" @click.stop="delHistory(item)"></i>
+            </li>
+            <li class="clear vux-1px-b" @click="clearHistory">
+              {{history.length ? '清空搜索历史' : '暂未搜索记录'}}
             </li>
           </ul>
-          <p class="clear ">清空搜索历史</p>
         </div>
-        <music-list></music-list>
+        <music-list v-show="searchKey.length"></music-list>
       </div>
     </scroller>
   </div>
@@ -38,6 +44,7 @@
   import Back from '@/components/back'
   import MusicList from '@/components/musicList'
   import _ from 'underscore'
+  import $ from 'jquery'
   import {Scroller, InlineLoading} from 'vux'
 
   export default {
@@ -55,39 +62,55 @@
       Scroller,
       InlineLoading
     },
+    watch: {
+      searchKey (curVal, oldVal) {
+        if (curVal.trim().length === 0) {
+          this.$refs.scroller.reset({top: 0})
+          this.searchKey = ''
+          if (oldVal.length > curVal.length) {
+            this.$nextTick(() => {
+              this.$refs.scroller.reset()
+            })
+          }
+        }
+      }
+    },
     methods: {
       getMusic () {
-        if (this.searchKey.length === 0) {
+        const vm = this
+        if (vm.searchKey.length === 0) {
           return
         }
-        this.$refs.search.blur()
-        this.$refs.scroller.reset({top: 0})
-        this.$store.commit('songsInit')
-        this.isLoading = true
-        let searchKey = this.searchKey
+        vm.$refs.search.blur()
+        vm.$refs.scroller.reset({top: 0})
+        vm.$store.commit('songsInit')
+        vm.isLoading = true
+        let searchKey = vm.searchKey
         let history = localStorage.searchHistory ? localStorage.searchHistory.split(',') : []
         history.unshift(searchKey)
-        this.history = _.uniq(history)
-        localStorage.searchHistory = this.history.join(',')
-        this.axios.post(this.api.music.search + searchKey).then((res) => {
-          this.isLoading = false
+        vm.history = _.uniq(history)
+        localStorage.searchHistory = vm.history.join(',')
+        vm.axios.post(vm.api.music.search + searchKey).then((res) => {
+          vm.isLoading = false
           if (res.data.code === 200) {
             let songList = res.data.result.songs
             let time = 0
-            for (let song of songList) {
-              song.thumbs = Math.round(Math.random() * 3000)
+            let thumbs = Math.round(Math.random() * 5000) + 2000
+            songList.forEach((v) => {
+              thumbs -= Math.round(Math.random() * 100)
+              v.thumbs = thumbs
               setTimeout(() => {
-                this.$store.commit('songsAdd', song)
-                this.$nextTick(() => {
-                  this.$refs.scroller.reset()
+                vm.$store.commit('songsAdd', v)
+                vm.$nextTick(() => {
+                  vm.$refs.scroller.reset()
                 })
               }, time)
               time += 100
-            }
+            })
           }
         }).catch(function () {
-          this.$vux.toast.text('请求接口失败~~', 'middle')
-          this.isLoading = false
+          vm.$vux.toast.text('请求接口失败~~', 'middle')
+          vm.isLoading = false
         })
       },
       searchMusic () {
@@ -95,10 +118,45 @@
           this.search = _.debounce(this.getMusic, 300)
         }
         this.search()
+      },
+      clearHistory () {
+        const vm = this
+        if (vm.history.length === 0) {
+          return
+        }
+        vm.$vux.confirm.show({
+          title: '温馨提示',
+          content: '是否清空所有搜索记录',
+          hideOnblur: true,
+          onConfirm () {
+            vm.history = []
+            localStorage.removeItem('searchHistory')
+            vm.$nextTick(() => {
+              vm.$refs.scroller.reset()
+            })
+          }
+        })
+      },
+      delHistory (searchKey) {
+        const vm = this
+        let $hItem = $(`.history-item:eq(${vm.history.indexOf(searchKey)})`)
+        $hItem.addClass('animated bounceOutLeft')
+        setTimeout(() => {
+          $hItem.removeClass('animated bounceOutLeft')
+          vm.history = vm.history.filter(v => v !== searchKey)
+          localStorage.searchHistory = vm.history.join(',')
+          vm.$nextTick(() => {
+            vm.$refs.scroller.reset()
+          })
+        }, 300)
+      },
+      chooseHistory (searchKey) {
+        this.searchKey = searchKey
+        this.getMusic()
       }
     },
     created () {
-      let history = localStorage.searchHistory.split(',')
+      let history = localStorage.searchHistory ? localStorage.searchHistory.split(',') : []
       this.history = history
     }
   }
@@ -111,10 +169,9 @@
     .search-header
       padding: 18px 24px
       background: $skin
-      .back-off
-        margin-bottom: 4px
+      transition: all .3s
       .text
-        margin-bottom: 20px
+        margin: 20px 0 28px 0
         text-align: center
         font-size: 1.2rem
         font-weight: lighter
@@ -160,10 +217,10 @@
             right: 0
             padding: 8px
             color: #C7C7C7
-      .clear
-        height: 40px
-        font-size: .8rem
-        line-height: 40px
-        text-align: center
-        color: #C7C7C7
+        .clear
+          height: 40px
+          font-size: .8rem
+          line-height: 40px
+          text-align: center
+          color: #C7C7C7
 </style>
