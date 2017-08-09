@@ -86,11 +86,13 @@
         vm.$store.commit('songsInit')
         vm.isLoading = true
         let searchKey = vm.searchKey
+        sessionStorage.searchKey = ''
         let history = localStorage.searchHistory ? localStorage.searchHistory.split(',') : []
         history.unshift(searchKey)
         vm.history = _.uniq(history)
         localStorage.searchHistory = vm.history.join(',')
         vm.axios.post(vm.api.music.search + searchKey).then((res) => {
+          sessionStorage.searchKey = searchKey
           vm.isLoading = false
           if (res.data.code === 200) {
             let songList = res.data.result.songs
@@ -132,7 +134,7 @@
             vm.history = []
             localStorage.removeItem('searchHistory')
             vm.$nextTick(() => {
-              vm.$refs.scroller.reset()
+              vm.$refs.scroller.reset({top: 0})
             })
           }
         })
@@ -157,7 +159,9 @@
     },
     created () {
       let history = localStorage.searchHistory ? localStorage.searchHistory.split(',') : []
+      let searchKey = sessionStorage.searchKey ? sessionStorage.searchKey : ''
       this.history = history
+      this.searchKey = searchKey
     }
   }
 </script>

@@ -149,10 +149,12 @@
           min.innerHTML = util.formatTime(parseInt(current))
           this.$nextTick(() => {
             let on = $('.lyric-all p.on')
-            let top = on.parent().scrollTop() - (on.parent().offset().top - on.offset().top) - on.parent().height() / 3
-            on.parent().animate({
-              scrollTop: top
-            }, 10)
+            if (on.length) {
+              let top = on.parent().scrollTop() - (on.parent().offset().top - on.offset().top) - on.parent().height() / 3
+              on.parent().animate({
+                scrollTop: top
+              }, 10)
+            }
           })
         }
       },
