@@ -32,15 +32,18 @@
     right: 0
     bottom: 0
     left: 0
+    display: flex
+    justify-content: center
+    align-items: center
+    flex-direction: column
     background: $skin
     .logo
-      margin: 40% auto 0 auto
-      width: 45vw
-      height: 45vw
+      width: 150px
+      height: 150px
       font-size: 7rem
       font-weight: lighter
       text-align: center
-      line-height: 45vw
+      line-height: 150px
       overflow: hidden
       border-radius: 50%
       background: #fff

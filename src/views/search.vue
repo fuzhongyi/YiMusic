@@ -104,6 +104,9 @@
               setTimeout(() => {
                 vm.$store.commit('songsAdd', v)
                 vm.$nextTick(() => {
+                  if (!vm.$refs.scroller) {
+                    return
+                  }
                   vm.$refs.scroller.reset()
                 })
               }, time)
@@ -117,7 +120,7 @@
       },
       searchMusic () {
         if (this.search === null) {
-          this.search = _.debounce(this.getMusic, 300)
+          this.search = _.debounce(this.getMusic, 1000)
         }
         this.search()
       },
@@ -210,7 +213,7 @@
         width: calc(100% - 30px)
         margin: 0 auto
         .history-item
-          padding: 5px 10px
+          padding: 5px 20px 5px 10px
           font-size: 1rem
           line-height: 2
           .fa-history

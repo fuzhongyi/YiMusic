@@ -4,39 +4,45 @@
       <back :size="'1.5rem'"></back>
       <div class="name animated bounceInDown">
         <inline-loading v-show="isLoading"></inline-loading>
-        <span class="text" :class="{small:song.name.length>12,smaller:song.name.length>22}">{{song.name}}</span>
+        <span class="text" :class="{small:song.name.length>10,smaller:song.name.length>20}">{{song.name}}</span>
       </div>
-      <swiper :loop="true" :dots-position="'center'" :height="'65vh'" @on-index-change="swiperChange">
-        <swiper-item>
-          <div class="singer animated bounceInDown">
-            <span class="line"></span>
-            <span class="text"> {{ song.ar | cutAr }}</span>
-            <span class="line"></span>
-          </div>
-          <div class="album animated bounceInDown">
-            <span class="text">{{ song.al.name }}</span>
-          </div>
-          <div class="img animated flip">
-            <img :src="song.al.picUrl" @click="showPic(0)" class="playing" :class="{paused:!isPlaying}"/>
-          </div>
-          <div class="lyric">
-            {{isLoading ? '歌词加载中...' : ''}}
-            {{lyric instanceof Array ? '' : (isLoading ? '' : lyric)}}
-            {{lyricIndex === -1 ? '' : lyric[lyricIndex === undefined ? lyric.length - 1 : lyricIndex][1]}}
-          </div>
-        </swiper-item>
-        <swiper-item>
-          <div class="lyric-all">
-            <p v-for="i in 6"></p>
-            {{isLoading ? '歌词加载中...' : ''}}
-            {{lyric instanceof Array ? '' : (isLoading ? '' : lyric)}}
-            <p v-for="data,index in lyric" :class="{on:index==(lyricIndex===undefined?lyric.length-1:lyricIndex)}"
-               @click="changeTime(data[0])">
-              {{data[1]}}</p>
-            <p v-for="i in 6"></p>
-          </div>
-        </swiper-item>
-      </swiper>
+      <div class="wrap-lyric">
+        <swiper :loop="true"
+                :height="height-182+'px'"
+                :dots-position="'center'"
+                :aspect-ratio="1"
+                @on-index-change="swiperChange">
+          <swiper-item>
+            <div class="singer animated bounceInDown">
+              <span class="line"></span>
+              <span class="text"> {{ song.ar | cutAr }}</span>
+              <span class="line"></span>
+            </div>
+            <div class="album animated bounceInDown">
+              <span class="text">{{ song.al.name }}</span>
+            </div>
+            <div class="img animated flip">
+              <img :src="song.al.picUrl" @click="showPic(0)" class="playing" :class="{paused:!isPlaying}"/>
+            </div>
+            <div class="lyric">
+              {{isLoading ? '歌词加载中...' : ''}}
+              {{lyric instanceof Array ? '' : (isLoading ? '' : lyric)}}
+              {{lyricIndex === -1 ? '' : lyric[lyricIndex === undefined ? lyric.length - 1 : lyricIndex][1]}}
+            </div>
+          </swiper-item>
+          <swiper-item>
+            <div class="lyric-all">
+              <p v-for="i in 6"></p>
+              {{isLoading ? '歌词加载中...' : ''}}
+              {{lyric instanceof Array ? '' : (isLoading ? '' : lyric)}}
+              <p v-for="data,index in lyric" :class="{on:index==(lyricIndex===undefined?lyric.length-1:lyricIndex)}"
+                 @click="changeTime(data[0])">
+                {{data[1]}}</p>
+              <p v-for="i in 6"></p>
+            </div>
+          </swiper-item>
+        </swiper>
+      </div>
       <div class="controls animated bounceInUp">
         <div class="progress">
           <range :value="progress"
@@ -148,12 +154,11 @@
           let min = document.getElementsByClassName('range-min')[0]
           min.innerHTML = util.formatTime(parseInt(current))
           this.$nextTick(() => {
-            let on = $('.lyric-all p.on')
-            if (on.length) {
-              let top = on.parent().scrollTop() - (on.parent().offset().top - on.offset().top) - on.parent().height() / 3
-              on.parent().animate({
-                scrollTop: top
-              }, 10)
+            let $on = document.querySelector('.lyric-all p.on')
+            if ($on !== null) {
+              let $lyricAll = document.querySelector('.lyric-all')
+              let top = $on.offsetTop - $lyricAll.offsetHeight * 2 / 5
+              $lyricAll.scrollTop = top
             }
           })
         }
@@ -226,14 +231,20 @@
       lyricRoll () {
         const vm = this
         let $audio = this.$refs.audio
+        let $temp = ''
         let timer = setInterval(() => {
-          let on = $('.lyric-all p.on')
-          if (vm.isOnHold || $audio.paused || on.length === 0) {
+          let $on = document.querySelector('.lyric-all p.on')
+          if ($temp === $on) {
+            return
+          }
+          $temp = $on
+          if (vm.isOnHold || $audio.paused || $on === null) {
             clearInterval(timer)
             return
           }
-          let top = on.parent().scrollTop() - (on.parent().offset().top - on.offset().top) - on.parent().height() / 3
-          on.parent().animate({
+          let $lyricAll = document.querySelector('.lyric-all')
+          let top = $on.offsetTop - $lyricAll.offsetHeight * 2 / 5
+          $('.lyric-all').animate({
             scrollTop: top
           })
         }, 300)
@@ -274,11 +285,11 @@
         let $rangeHandle = $progress.getElementsByClassName('range-handle')[0]
         let $ly = document.getElementsByClassName('lyric-all')[0]
         $rangeHandle.addEventListener('touchstart', () => {
-          vm.togglePlay()
+          vm.isPlaying && vm.togglePlay()
         })
         $rangeHandle.addEventListener('touchend', () => {
           setTimeout(() => {
-            vm.togglePlay()
+            !vm.isPlaying && vm.togglePlay()
           }, 300)
         })
         $ly.addEventListener('touchstart', () => {
@@ -333,64 +344,74 @@
           font-size: 1rem
         &.smaller
           font-size: 0.5rem
-    .vux-slider
-      text-align: center
-    .singer
-      .line
-        display: inline-block
-        position: relative
-        top: -0.3rem
-        width: 12px
-        border-top: 1px solid #fff
-      .text
-        font-size: 0.9rem
-    .album
-      text-align: center
-      padding: 20px
-      .text
-        display: inline-block
-        padding: 2px 6px
-        max-width: 220px
-        overflow: hidden
-        text-overflow: ellipsis
-        font-size: 0.7rem
-        line-height: 0.7rem
-        border: 2px solid rgba(255, 255, 255, 0.5)
-        border-radius: 5px
-        white-space: nowrap
-    .lyric
-      position: absolute
-      bottom: 30px
+    .wrap-lyric
+      position: fixed
+      top: 0
+      padding: 63px 0 119px
       width: 100%
-      font-size: 0.9rem
-      text-align: center
-      color: $skin
-    .lyric-all
-      height: calc(100% - 30px)
-      overflow: auto
-      &::-webkit-scrollbar
-        display: none
-      p
-        padding: 10px 0
-        font-size: 0.8rem
-        &.on
-          color: $skin
-    .img
-      text-align: center
-      img
-        width: 65vw
-        height: 65vw
-        border-radius: 50%
-        border: 5px solid rgba(7, 17, 27, 0.1)
-        @media only screen and (max-width: 320px)
-          width: 60vw
-          height: 60vw
-        &.playing
-          animation: 30s rotate linear forwards infinite
-        &.paused
-          animation-play-state: paused
+      height: 100%
+      box-sizing: border-box
+      .vux-slider
+        text-align: center
+      .singer
+        .line
+          display: inline-block
+          position: relative
+          top: -0.3rem
+          width: 12px
+          border-top: 1px solid #fff
+        .text
+          font-size: 0.9rem
+      .album
+        text-align: center
+        padding: 20px 20px 0 20px
+        .text
+          display: inline-block
+          padding: 2px 6px
+          max-width: 220px
+          overflow: hidden
+          text-overflow: ellipsis
+          font-size: 0.7rem
+          line-height: 0.7rem
+          border: 2px solid rgba(255, 255, 255, 0.5)
+          border-radius: 5px
+          white-space: nowrap
+      .lyric
+        position: absolute
+        bottom: 30px
+        width: 100%
+        font-size: 0.9rem
+        text-align: center
+        color: $skin
+      .lyric-all
+        height: calc(100% - 30px)
+        overflow: auto
+        &::-webkit-scrollbar
+          display: none
+        p
+          padding: 10px 0
+          font-size: 0.9rem
+          &.on
+            color: $skin
+      .img
+        display: flex
+        height: calc(100% - 115px)
+        align-items: center
+        justify-content: center
+        img
+          width: 244px
+          height: 244px
+          border-radius: 50%
+          border: 5px solid rgba(7, 17, 27, 0.1)
+          @media only screen and (max-width: 320px)
+            width: 192px
+            height: 192px
+          &.playing
+            animation: 20s circling linear forwards infinite
+          &.paused
+            animation-play-state: paused
     .controls
-      position: absolute
+      position: fixed
       bottom: 30px
       width: 100%
       text-align: center
@@ -421,20 +442,20 @@
         justify-content: center
         margin: 0 10px
         &.pre, &.next
-          width: 6vw
-          height: 6vw
+          width: 20px
+          height: 20px
           font-size: 1.2rem
         &.begin
-          width: 12vw
-          height: 12vw
+          width: 38px
+          height: 38px
           font-size: 1.5rem
           .fa-play
             position: relative
             left: 3px
 
-  @keyframes rotate
+  @keyframes circling
     from
       transform: rotate(0)
     to
-      transform: rotate(360deg)
+      transform: rotate(1turn)
 </style>
