@@ -181,6 +181,7 @@
         vm.axios.get(vm.api.music.detail, {params: {id}}).then((res) => {
           vm.isLoading = false
           if (res.data.status.code === 200) {
+            vm.song = res.data.data
             vm.mp3 = res.data.data.mp3
             let $audio = vm.$refs.audio
             $audio.src = vm.mp3.url
