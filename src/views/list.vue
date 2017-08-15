@@ -26,6 +26,8 @@
           songList.forEach((v) => {
             thumbs -= Math.round(Math.random() * 100)
             v.thumbs = thumbs
+            v.al = v.album
+            v.ar = v.artists
           })
           vm.$store.commit('setSongs', songList)
         } else {

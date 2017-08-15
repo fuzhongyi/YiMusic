@@ -17,7 +17,6 @@
                 <div class="content">
                   <span class="name">{{song.name}}</span>
                   <span class="singer" v-if="song.ar">{{ song.ar | cutAr }} - {{ song.al.name }}</span>
-                  <span class="singer" v-if="song.artists">{{ song.artists | cutAr }} - {{ song.album.name }}</span>
                   <div class="thumbs">
                     <countup :start-val="1" :end-val="song.thumbs" :duration="2" class="num"></countup>
                     <span class="text">赞</span>

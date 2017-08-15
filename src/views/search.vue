@@ -11,7 +11,7 @@
                v-model="searchKey" @keyup="searchMusic" ref="search">
       </div>
     </div>
-    <scroller :height="searchKey.length?'-70':'-137'" lock-x :bounce="false" ref="scroller">
+    <scroller :height="!searchKey.length?'-137':'-70'" lock-x :bounce="false" ref="scroller">
       <div>
         <transition enter-active-class="animated bounceIn">
           <p class="inline-loading" v-show="isLoading">

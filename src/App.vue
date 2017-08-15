@@ -20,9 +20,9 @@
         </group>
       </div>
       <view-box body-padding-bottom="0px">
-        <transition :name="direction === 'forward' ? 'in' : 'out'">
-          <router-view></router-view>
-        </transition>
+        <!--<transition :name="direction === 'forward' ? 'in' : 'out'">-->
+        <router-view></router-view>
+        <!--</transition>-->
       </view-box>
     </drawer>
   </div>
