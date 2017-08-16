@@ -344,7 +344,7 @@
         &.small
           font-size: 1rem
         &.smaller
-          font-size: 0.5rem
+          font-size: 0.9rem
     .wrap-lyric
       position: fixed
       top: 0

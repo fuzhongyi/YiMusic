@@ -59,10 +59,10 @@
         })
         document.addEventListener('touchend', (e) => {
           let endX = e.changedTouches[0].clientX
-          if (endX - startX > 100) {
+          if (endX - startX > 150) {
             this.drawerVisibility = true
           }
-          if (endX - startX < -100) {
+          if (endX - startX < -150) {
             this.drawerVisibility = false
           }
         })

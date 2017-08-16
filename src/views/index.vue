@@ -12,7 +12,7 @@
     mounted () {
       setTimeout(() => {
         this.$router.push({
-          name: 'search'
+          name: 'rank'
         })
       }, 4000)
     }

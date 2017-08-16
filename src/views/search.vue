@@ -1,42 +1,42 @@
 <template>
   <div class="search">
-    <div class="search-header" :style="{height:searchKey.length?'34px':'101px'}">
-      <transition
-        enter-active-class="animated bounceIn"
-        leave-active-class="animated bounceOut">
-        <div class="text" v-show="searchKey.length===0">音乐菜单</div>
-      </transition>
-      <div class="content">
-        <input type="text" placeholder="输入你所需要查找的歌曲"
-               v-model="searchKey" @keyup="searchMusic" ref="search">
-      </div>
-    </div>
-    <scroller :height="!searchKey.length?'-137':'-70'" lock-x :bounce="false" ref="scroller">
-      <div>
-        <transition enter-active-class="animated bounceIn">
-          <p class="inline-loading" v-show="isLoading">
-            <inline-loading></inline-loading>
-            <span class="text">正在加载</span>
-          </p>
+    <sticky>
+      <div class="search-header" :style="{height:isShowHistory?'101px':'34px'}">
+        <transition
+          enter-active-class="animated bounceIn"
+          leave-active-class="animated bounceOut">
+          <div class="text" v-show="isShowHistory">音乐菜单</div>
         </transition>
-        <div class="history" v-show="searchKey.length===0">
-          <ul class="history-wrapper">
-            <li class="history-item vux-1px-b"
-                v-for="item,index in history"
-                :key="index"
-                @click="chooseHistory(item)">
-              <i class="fa fa-history"></i>
-              <span class="text">{{item}}</span>
-              <i class="close fa fa-times" @click.stop="delHistory(item)"></i>
-            </li>
-            <li class="clear vux-1px-b" @click="clearHistory">
-              {{history.length ? '清空搜索历史' : '暂未搜索记录'}}
-            </li>
-          </ul>
+        <div class="content">
+          <input type="text" placeholder="输入你所需要查找的歌曲"
+                 v-model="searchKey" @keyup="searchMusic" ref="search">
         </div>
-        <music-list v-show="searchKey.length"></music-list>
       </div>
-    </scroller>
+    </sticky>
+    <view-box body-padding-bottom="0px">
+      <transition enter-active-class="animated bounceIn">
+        <p class="inline-loading" v-show="isLoading">
+          <inline-loading></inline-loading>
+          <span class="text">正在加载</span>
+        </p>
+      </transition>
+      <div class="history" v-show="isShowHistory">
+        <ul class="history-wrapper">
+          <li class="history-item vux-1px-b"
+              v-for="item,index in history"
+              :key="index"
+              @click="chooseHistory(item)">
+            <i class="fa fa-history"></i>
+            <span class="text">{{item}}</span>
+            <i class="close fa fa-times" @click.stop="delHistory(item)"></i>
+          </li>
+          <li class="clear vux-1px-b" @click="clearHistory">
+            {{history.length ? '清空搜索历史' : '暂未搜索记录'}}
+          </li>
+        </ul>
+      </div>
+      <music-list v-show="!isShowHistory"></music-list>
+    </view-box>
   </div>
 </template>
 
@@ -45,7 +45,7 @@
   import MusicList from '@/components/musicList'
   import _ from 'underscore'
   import $ from 'jquery'
-  import {Scroller, InlineLoading} from 'vux'
+  import {ViewBox, Sticky, InlineLoading} from 'vux'
 
   export default {
     data () {
@@ -53,26 +53,31 @@
         searchKey: '',
         search: null,
         isLoading: false,
+        isFocus: false,
         history: []
       }
     },
     components: {
       Back,
       MusicList,
-      Scroller,
+      ViewBox,
+      Sticky,
       InlineLoading
     },
-    watch: {
-      searchKey (curVal, oldVal) {
-        if (curVal.trim().length === 0) {
-          this.$refs.scroller.reset({top: 0})
-          this.searchKey = ''
-          if (oldVal.length > curVal.length) {
-            this.$nextTick(() => {
-              this.$refs.scroller.reset()
-            })
-          }
+    computed: {
+      isShowHistory () {
+        if (_.isEmpty(this.searchKey) && !this.isFocus) {
+          return true
         }
+        return false
+      }
+    },
+    watch: {
+      searchKey (curVal) {
+        if (curVal.trim().length === 0) {
+          this.searchKey = ''
+        }
+        sessionStorage.searchKey = this.searchKey
       }
     },
     methods: {
@@ -82,9 +87,9 @@
           return
         }
         vm.$refs.search.blur()
-        vm.$refs.scroller.reset({top: 0})
         vm.$store.commit('songsInit')
         vm.isLoading = true
+        vm.searchKey = vm.searchKey.trim()
         let searchKey = vm.searchKey
         sessionStorage.searchKey = ''
         let history = localStorage.searchHistory ? localStorage.searchHistory.split(',') : []
@@ -92,23 +97,17 @@
         vm.history = _.uniq(history)
         localStorage.searchHistory = vm.history.join(',')
         vm.axios.post(vm.api.music.search + searchKey).then((res) => {
-          sessionStorage.searchKey = searchKey
           vm.isLoading = false
           if (res.data.code === 200) {
             let songList = res.data.result.songs
             let time = 0
-            let thumbs = Math.round(Math.random() * 5000) + 2000
+            let thumbs = Math.round(Math.random() * 7999) + 2000
+            let num = thumbs / songList.length
             songList.forEach((v) => {
-              thumbs -= Math.round(Math.random() * 100)
+              thumbs -= Math.round(Math.random() * num)
               v.thumbs = thumbs
               setTimeout(() => {
                 vm.$store.commit('songsAdd', v)
-                vm.$nextTick(() => {
-                  if (!vm.$refs.scroller) {
-                    return
-                  }
-                  vm.$refs.scroller.reset()
-                })
               }, time)
               time += 100
             })
@@ -136,9 +135,6 @@
           onConfirm () {
             vm.history = []
             localStorage.removeItem('searchHistory')
-            vm.$nextTick(() => {
-              vm.$refs.scroller.reset({top: 0})
-            })
           }
         })
       },
@@ -150,9 +146,6 @@
           $hItem.removeClass('animated bounceOutLeft')
           vm.history = vm.history.filter(v => v !== searchKey)
           localStorage.searchHistory = vm.history.join(',')
-          vm.$nextTick(() => {
-            vm.$refs.scroller.reset()
-          })
         }, 300)
       },
       chooseHistory (searchKey) {
@@ -165,6 +158,15 @@
       let searchKey = sessionStorage.searchKey ? sessionStorage.searchKey : ''
       this.history = history
       this.searchKey = searchKey
+    },
+    mounted () {
+      let $search = this.$refs.search
+      $search.addEventListener('focus', () => {
+        this.isFocus = true
+      })
+      $search.addEventListener('blur', () => {
+        this.isFocus = false
+      })
     }
   }
 </script>

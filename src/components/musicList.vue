@@ -2,7 +2,7 @@
   <div class="music-list">
     <ul class="music-wrapper">
       <swipeout>
-        <transition-group enter-active-class="animated bounceIn">
+        <transition-group enter-active-class="animated bounceInLeft">
           <swipeout-item transition-mode="reveal" :style="{'background': index%2!=0?'#F1F0F6':''}"
                          @click.native="toPlay(index)" v-for="song,index in getSongs" :key="index">
             <div slot="right-menu">
