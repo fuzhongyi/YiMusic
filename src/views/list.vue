@@ -34,6 +34,11 @@
       const vm = this
       let id = vm.$route.params.id
       vm.$store.commit('songsInit')
+      let list = sessionStorage.list ? JSON.parse(sessionStorage.list) : {}
+      if (list[id]) {
+        vm.$store.commit('setSongs', list[id])
+        return
+      }
       vm.$store.commit('updateLoadingStatus', {isLoading: true})
       vm.axios.get(vm.api.music.playlist, {
         params: {
@@ -52,6 +57,9 @@
             v.ar = v.artists
           })
           vm.$store.commit('setSongs', songList)
+          let list = sessionStorage.list ? JSON.parse(sessionStorage.list) : {}
+          list[id] = songList
+          sessionStorage.list = JSON.stringify(list)
         } else {
           vm.$vux.toast.text(`请求接口失败~~${res.data.code}`, 'middle')
         }

@@ -380,6 +380,8 @@
       .lyric
         position: absolute
         bottom: 30px
+        box-sizing: border-box
+        padding: 0 20px
         width: 100%
         font-size: 0.9rem
         text-align: center
