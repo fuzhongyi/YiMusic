@@ -12,7 +12,7 @@
     mounted () {
       setTimeout(() => {
         this.$router.push({
-          name: 'rank'
+          name: 'home'
         })
       }, 4000)
     }

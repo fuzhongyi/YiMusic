@@ -7,6 +7,11 @@
             :drawer-style="{width: '200px'}">
       <div class="layout" slot="drawer">
         <group title="一起,音乐" style="margin-top:20px;">
+          <cell title="主页" link="/home" @click.native="drawerVisibility = false">
+            <div slot="icon">
+              <i class="fa fa-home" aria-hidden="true"></i>
+            </div>
+          </cell>
           <cell title="发现" link="/search" @click.native="drawerVisibility = false">
             <div slot="icon">
               <i class="fa fa-search"></i>
@@ -20,9 +25,9 @@
         </group>
       </div>
       <view-box body-padding-bottom="0px">
-        <!--<transition :name="direction === 'forward' ? 'in' : 'out'">-->
-        <router-view></router-view>
-        <!--</transition>-->
+        <transition :name="direction === 'forward' ? 'in' : 'out'">
+          <router-view></router-view>
+        </transition>
       </view-box>
     </drawer>
   </div>
@@ -59,10 +64,10 @@
         })
         document.addEventListener('touchend', (e) => {
           let endX = e.changedTouches[0].clientX
-          if (endX - startX > 150) {
+          if (endX - startX > 200) {
             this.drawerVisibility = true
           }
-          if (endX - startX < -150) {
+          if (endX - startX < -100) {
             this.drawerVisibility = false
           }
         })

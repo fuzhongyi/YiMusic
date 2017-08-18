@@ -7,6 +7,8 @@ export default {
     search: 'https://api.imjad.cn/cloudmusic/?type=search&s=',
     lyric: `${wangYi}/api/song/lyric`,
     detail: 'https://bird.ioliu.cn/netease/song',
-    playlist: `${wangYi}/api/playlist/detail`
+    playlist: `${wangYi}/api/playlist/detail`,
+    newSong: `${wangYi}/weapi/personalized/newsong`,
+    hotSong: `${wangYi}/weapi/v3/playlist/detail`
   }
 }

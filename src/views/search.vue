@@ -177,7 +177,7 @@
   .search
     .search-header
       padding: 18px 24px
-      background: $skin
+      background: linear-gradient(45deg, #00af6e, rgba(0, 0, 0, 0))
       transition: all .3s
       .text
         margin: 20px 0 28px 0

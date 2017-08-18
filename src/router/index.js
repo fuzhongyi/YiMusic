@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import index from '@/views/index'
-import home from '@/views/rank'
+import rank from '@/views/rank'
+import home from '@/views/home'
 import search from '@/views/search'
 import play from '@/views/play'
 import list from '@/views/list'
@@ -15,9 +16,14 @@ const routes = [
     component: index
   },
   {
+    path: '/home',
+    name: 'home',
+    component: home
+  },
+  {
     path: '/rank',
     name: 'rank',
-    component: home
+    component: rank
   },
   {
     path: '/search',

@@ -384,6 +384,7 @@
         padding: 0 20px
         width: 100%
         font-size: 0.9rem
+        line-height: 1.2
         text-align: center
         color: $skin
       .lyric-all
