@@ -12,7 +12,7 @@
               <i class="fa fa-home" aria-hidden="true"></i>
             </div>
           </cell>
-          <cell title="发现" link="/search" @click.native="drawerVisibility = false">
+          <cell title="搜索" link="/search" @click.native="drawerVisibility = false">
             <div slot="icon">
               <i class="fa fa-search"></i>
             </div>

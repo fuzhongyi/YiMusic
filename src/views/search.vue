@@ -177,8 +177,17 @@
   .search
     .search-header
       padding: 18px 24px
-      background: linear-gradient(45deg, #00af6e, rgba(0, 0, 0, 0))
+      background-image: linear-gradient(45deg, #46B3BA, rgba(0, 0, 0, 0))
       transition: all .3s
+      &:after
+        content: ''
+        position: absolute
+        top: 0
+        right: 0
+        bottom: 0
+        left: 0
+        z-index: -1
+        background: rgba(70, 179, 186, 0.2)
       .text
         margin: 20px 0 28px 0
         text-align: center

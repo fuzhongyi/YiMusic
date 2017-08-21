@@ -86,16 +86,18 @@
           .name
             display: block
             max-width: 280px
+            height: 20px
             overflow: hidden
             white-space: nowrap
             text-overflow: ellipsis
-            margin: 15px auto 15px 0
+            margin: 15px auto 13px 0
             line-height: 1.1
             @media only screen and (max-width: 320px)
               max-width: 180px
           .singer
             display: block
             max-width: 180px
+            height: 20px
             overflow: hidden
             white-space: nowrap
             text-overflow: ellipsis

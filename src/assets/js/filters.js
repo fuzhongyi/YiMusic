@@ -10,6 +10,15 @@ const cutAr = val => {
     return `${val[0].name}/${val[1].name}`
   }
 }
+
+/**
+ * 播放数量(单位:万)
+ *
+ * @param val
+ */
+const playCount = val => Math.round(val / 10000)
+
 export {
-  cutAr
+  cutAr,
+  playCount
 }

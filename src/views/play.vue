@@ -101,7 +101,7 @@
       lyricIndex () {
         if (this.lyric instanceof Array && this.lyric.length !== 0) {
           for (let i in this.lyric) {
-            if (this.current - 1.8 < this.lyric[i][0]) {
+            if (this.current - 1.5 < this.lyric[i][0]) {
               return i
             }
           }

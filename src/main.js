@@ -30,7 +30,7 @@ router.beforeEach(function (to, from, next) {
   const toIndex = history.getItem(to.path)
   const fromIndex = history.getItem(from.path)
   if (sideslipPath.includes(to.path)) {
-    history.clear()
+    history.setItem('/', 0)
   }
   if (toIndex) {
     if (!fromIndex || parseInt(toIndex, 10) > parseInt(fromIndex, 10) || (toIndex === '0' && fromIndex === '0')) {

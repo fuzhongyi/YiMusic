@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="home" :style="{width: homeWidth}">
     <div class="banner-wrapper">
       <swiper :loop="true"
               :aspect-ratio="147/320"
@@ -24,9 +24,13 @@
           <div class="remd-songs">
             <template v-for="songs in recommend">
               <div class="remd-wrapper">
-                <a class="remd-item" v-for="song in songs">
+                <a class="remd-item" v-for="song in songs" :href="'#/music/songsheet/'+song.id">
                   <div class="remd-img">
                     <img :src="song.picUrl">
+                    <div class="play-num">
+                      <i class="fa fa-headphones"></i>
+                      <span class="num">{{song.playCount | playCount}}万</span>
+                    </div>
                   </div>
                   <p class="remd-text">{{song.name}}</p>
                 </a>
@@ -36,7 +40,7 @@
           <subhead text="最新音乐"></subhead>
           <div class="new">
             <ul class="new-wrapper">
-              <li class="new-item vux-1px-b" v-for="song in newSongs">
+              <li class="new-item" :class="{'vux-1px-b':index!==newSongs.length-1}" v-for="(song,index) in newSongs">
                 <div class="new-info">
                   <div class="name thide">{{song.name}}</div>
                   <div class="singer thide">
@@ -64,14 +68,14 @@
             <ul class="hot-wrapper">
               <li class="hot-item" v-for="(song,index) in hotSongs">
                 <div class="rank" :class="{'three':index<3}">{{(index + 1) < 10 ? '0' + (index + 1) : index + 1}}</div>
-                <div class="hot-info vux-1px-b">
+                <div class="hot-info" :class="{'vux-1px-b':index!==hotSongs.length-1}">
                   <div class="name thide">{{song.name}}</div>
                   <div class="singer thide">
                     <i class="sghot hot-icon" v-if="song.fee===0"></i>
                     {{ song.ar | cutAr }} - {{ song.al.name }}
                   </div>
                 </div>
-                <div class="hot-play vux-1px-b" @click="toPlay(index)">
+                <div class="hot-play" :class="{'vux-1px-b':index!==hotSongs.length-1}" @click="toPlay(index)">
                   <span class="icon hot-icon"></span>
                 </div>
               </li>
@@ -87,12 +91,11 @@
   import Subhead from '@/components/subhead'
   import MusicList from '@/components/musicList'
   import {Swiper, SwiperItem, Tab, TabItem, Sticky} from 'vux'
-  import {mapState} from 'vuex'
-  import {cutAr} from '@/assets/js/filters'
+  import {cutAr, playCount} from '@/assets/js/filters'
   import moment from 'moment'
 
   const data = require('../../data.json')
-
+  window.REDUX_STATE = ''
   export default {
     components: {
       Swiper,
@@ -118,11 +121,6 @@
         })
       }
     },
-    computed: {
-      ...mapState({
-        songs: state => state.songs.songs
-      })
-    },
     data () {
       return {
         banner: data.banner,
@@ -131,7 +129,8 @@
         recommend: data.recommend,
         newSongs: [],
         hotSongs: [],
-        updateTime: ''
+        updateTime: '',
+        homeWidth: window.screen.availWidth + 'px'
       }
     },
     methods: {
@@ -145,7 +144,7 @@
             let songList = []
             let result = res.data.result
             let thumbs = Math.round(Math.random() * 7999) + 2000
-            let num = thumbs / songList.length
+            let num = thumbs / result.length
             result.forEach((v) => {
               thumbs -= Math.round(Math.random() * num)
               v.song.thumbs = thumbs
@@ -155,6 +154,10 @@
             })
             vm.newSongs = songList
             this.$store.commit('setSongs', vm.newSongs)
+            this.$nextTick(() => {
+              let height = this.$refs.remd.offsetHeight
+              this.$refs.swiper.xheight = `${height}px`
+            })
           }
         }).catch(function () {
           vm.$vux.toast.text('请求接口失败~~', 'middle')
@@ -171,7 +174,7 @@
             let tracks = res.data.playlist.tracks
             vm.updateTime = moment(new Date(res.data.playlist.updateTime)).format('MM月DD日')
             let thumbs = Math.round(Math.random() * 7999) + 2000
-            let num = thumbs / songList.length
+            let num = thumbs / tracks.length
             tracks.forEach((v) => {
               thumbs -= Math.round(Math.random() * num)
               v.thumbs = thumbs
@@ -195,7 +198,8 @@
       this.getHotSong()
     },
     filters: {
-      cutAr
+      cutAr,
+      playCount
     }
   }
 </script>
@@ -210,7 +214,7 @@
       .remd-songs
         display: flex
         flex-direction: column
-        padding-bottom: 18px
+        padding-bottom: 10px
         .remd-wrapper
           padding-bottom: 16px
           .remd-item
@@ -227,8 +231,25 @@
               padding-left: 2px
               padding-right: 0px
             .remd-img
+              position: relative
               img
                 width: 100%
+              .play-num
+                position: absolute
+                top: 2px
+                right: 5px
+                z-index: 1
+                color: #fff
+                font-size: .7rem
+                text-shadow: 1px 0 0 rgba(0, 0, 0, .15)
+              &:after
+                content: " "
+                position: absolute
+                left: 0;
+                top: 0;
+                width: 100%
+                height: 20px
+                background-image: linear-gradient(180deg, rgba(0, 0, 0, .2), transparent)
             .remd-text
               display: -webkit-box
               -webkit-line-clamp: 2
