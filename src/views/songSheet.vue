@@ -1,5 +1,6 @@
 <template>
   <div class="song-sheet">
+    <back size="1.2rem" :circle="false"></back>
     <section class="sheet-header">
       <div class="h-back"
            :style="{'background-image':'url('+songSheet.coverImgUrl+')'}">
@@ -16,8 +17,9 @@
           </div>
         </div>
         <div class="h-right">
-          <div class="title">{{songSheet.name}}</div>
-          <a class="avatar" :href="'http://music.163.com/#/user?id='+songSheet.creator.userId">
+          <div class="title" @click="toggleDesc">{{songSheet.name}}</div>
+          <!--<a class="avatar" :href="'http://music.163.com/#/user?id='+songSheet.creator.userId">-->
+          <a class="avatar" @click="toggleDesc">
             <img class="photo" :src="songSheet.creator.avatarUrl">
             <span class="name">{{songSheet.creator.nickname}}</span>
           </a>
@@ -42,7 +44,8 @@
             <img :src="songSheet.coverImgUrl">
           </div>
           <p class="i-title">{{songSheet.name}}</p>
-          <a class="i-avatar" :href="'http://music.163.com/#/user?id='+songSheet.creator.userId">
+          <!--<a class="i-avatar" :href="'http://music.163.com/#/user?id='+songSheet.creator.userId">-->
+          <a class="i-avatar">
             <img class="photo" :src="songSheet.creator.avatarUrl" width="28" height="28">
             <span class="name">{{songSheet.creator.nickname}}</span>
           </a>
@@ -62,6 +65,7 @@
   import MusicList from '@/components/musicList'
   import {Tab, TabItem, Sticky, ViewBox} from 'vux'
   import {playCount} from '@/assets/js/filters'
+  import Back from '@/components/back'
 
   export default {
     data () {
@@ -75,7 +79,8 @@
       TabItem,
       Sticky,
       MusicList,
-      ViewBox
+      ViewBox,
+      Back
     },
     methods: {
       getSongSheet () {
@@ -118,9 +123,13 @@
 
 <style lang="stylus" rel="stylesheet/stylus">
   .song-sheet
+    .back
+      position: absolute
+      top: 7px
+      left: 15px
     .sheet-header
       position: relative
-      padding: 30px 10px 30px 15px
+      padding: 32px 10px 30px 15px
       z-index: 4
       overflow: hidden
       color: #fff
@@ -187,7 +196,7 @@
           flex: 1 1 auto
           margin-left: 16px
           .title
-            padding-top: 3px
+            margin-top: 3px
             line-height: 1.4
             display: -webkit-box
             overflow: hidden
@@ -206,7 +215,7 @@
               font-size: .9rem
               color: #fefefe
           .intro
-            padding-bottom: 5px
+            magrin-bottom: 5px
             font-size: .8rem
             line-height: 1.5
             display: -webkit-box

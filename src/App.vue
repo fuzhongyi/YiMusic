@@ -19,7 +19,7 @@
           </cell>
           <cell title="排行榜" link="/rank" @click.native="drawerVisibility = false">
             <div slot="icon">
-              <i class="fa fa-headphones" aria-hidden="true"></i>
+              <i class="fa fa-bar-chart" aria-hidden="true"></i>
             </div>
           </cell>
         </group>
@@ -38,6 +38,7 @@
   import 'animate.css'
   import {Drawer, Group, Cell, ViewBox} from 'vux'
   import {mapState} from 'vuex'
+
   export default {
     data () {
       return {

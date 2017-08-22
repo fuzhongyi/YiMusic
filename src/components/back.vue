@@ -1,5 +1,6 @@
 <template>
-  <i class="back fa fa-arrow-circle-o-left" :style="{fontSize:size}" aria-hidden="true" @click="goBack"></i>
+  <i class="back fa" :class="circle===true?'fa-arrow-circle-o-left':'fa-arrow-left'" :style="{fontSize:size}"
+     aria-hidden="true" @click="goBack"></i>
 </template>
 
 <script type="text/ecmascript-6">
@@ -8,6 +9,10 @@
       size: {
         type: String,
         default: '1rem'
+      },
+      circle: {
+        type: Boolean,
+        default: true
       }
     },
     methods: {

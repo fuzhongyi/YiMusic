@@ -1,11 +1,15 @@
 <template>
   <div class="home" :style="{width: homeWidth}">
     <div class="banner-wrapper">
+      <nav class="home-nav" @click="openNav">
+        <i class="fa fa-bars"></i>
+      </nav>
       <swiper :loop="true"
               :aspect-ratio="147/320"
               :auto="true">
         <swiper-item v-for="(item,index) in banner" :key="index">
-          <a :href="item.url" class="banner-item">
+          <!--<a :href="item.url" class="banner-item">-->
+          <a class="banner-item">
             <img :src="item.picUrl" width="100%">
           </a>
         </swiper-item>
@@ -191,6 +195,9 @@
           name: 'play',
           params: {'index': index}
         })
+      },
+      openNav () {
+        this.$parent.$parent.$parent.drawerVisibility = true
       }
     },
     created () {
@@ -209,6 +216,13 @@
     .hot-icon
       background: url('../assets/image/hot_icon.png') no-repeat
       background-size: 166px 97px
+    .banner-wrapper
+      position: relative
+      .home-nav
+        position: absolute
+        padding: 10px
+        z-index: 10
+        color: #56E3AF
     .remd
       display: table
       .remd-songs
