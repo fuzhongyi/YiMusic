@@ -119,7 +119,7 @@
       },
       searchMusic () {
         if (this.search === null) {
-          this.search = _.debounce(this.getMusic, 1000)
+          this.search = _.debounce(this.getMusic, 300)
         }
         this.search()
       },

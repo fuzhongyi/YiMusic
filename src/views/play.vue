@@ -101,8 +101,8 @@
       lyricIndex () {
         if (this.lyric instanceof Array && this.lyric.length !== 0) {
           for (let i in this.lyric) {
-            if (this.current - 1.5 < this.lyric[i][0]) {
-              return i
+            if (this.current + 1 < this.lyric[i][0]) {
+              return i ? i - 1 : 0
             }
           }
         } else {
@@ -393,8 +393,9 @@
         &::-webkit-scrollbar
           display: none
         p
-          padding: 10px 0
+          padding: 10px 20px
           font-size: 0.9rem
+          line-height: 1.6
           &.on
             color: $skin
       .img

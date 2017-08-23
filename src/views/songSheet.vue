@@ -86,9 +86,11 @@
       getSongSheet () {
         const vm = this
         let id = vm.$route.params.id
+        vm.$store.commit('updateLoadingStatus', {isLoading: true})
         vm.axios.post(vm.api.music.playlist, {
           'id': id
         }).then((res) => {
+          vm.$store.commit('updateLoadingStatus', {isLoading: false})
           if (res.data.code === 200) {
             let songList = []
             let tracks = res.data.result.tracks
@@ -105,6 +107,7 @@
             vm.songSheet = res.data.result
           }
         }).catch(function () {
+          vm.$store.commit('updateLoadingStatus', {isLoading: false})
           vm.$vux.toast.text('请求接口失败~~', 'middle')
         })
       },
@@ -123,6 +126,7 @@
 
 <style lang="stylus" rel="stylesheet/stylus">
   .song-sheet
+    position: relative
     .back
       position: absolute
       top: 7px

@@ -15,7 +15,7 @@
   }
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus">
+<style lang="stylus" rel="stylesheet/stylus" scoped>
   .loading
     position: fixed
     z-index: 999
@@ -25,9 +25,10 @@
     left: 0
     .img
       margin: calc(50vh - 15vw) auto
-      width: 30vw
-      height: 30vw
-      border-radius: 10px
+      width: 90px
+      height: 90px
+      border-radius: 50%
       background: url("../assets/image/loading.gif") no-repeat
       background-size: cover
+      box-shadow: 0 0 20px rgba(0, 0, 0, .1)
 </style>

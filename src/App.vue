@@ -93,6 +93,7 @@
     will-change: transform
     transition: all 500ms
     height: 100%
+    width: 100%
     position: absolute
     backface-visibility: hidden
     perspective: 1000

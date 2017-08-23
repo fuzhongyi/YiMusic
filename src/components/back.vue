@@ -23,7 +23,7 @@
   }
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus">
+<style lang="stylus" rel="stylesheet/stylus" scoped>
   .back
     z-index: 999
     color: rgba(255, 255, 255, 0.8)

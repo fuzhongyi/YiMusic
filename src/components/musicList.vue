@@ -63,7 +63,7 @@
   }
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus">
+<style lang="stylus" rel="stylesheet/stylus" scoped>
   .music-list
     .music-wrapper
       .song-list

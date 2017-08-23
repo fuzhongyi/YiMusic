@@ -1,8 +1,9 @@
 <template>
   <div class="home" :style="{width: homeWidth}">
     <div class="banner-wrapper">
-      <nav class="home-nav" @click="openNav">
-        <i class="fa fa-bars"></i>
+      <nav class="home-nav">
+        <i class="fa fa-bars" @click="openNav"></i>
+        <router-link class="fa fa-search" :to="{name:'search'}"></router-link>
       </nav>
       <swiper :loop="true"
               :aspect-ratio="147/320"
@@ -99,7 +100,7 @@
   import moment from 'moment'
 
   const data = require('../../data.json')
-  window.REDUX_STATE = ''
+
   export default {
     components: {
       Swiper,
@@ -220,9 +221,17 @@
       position: relative
       .home-nav
         position: absolute
-        padding: 10px
+        padding: 5px
+        width: 100%
+        box-sizing: border-box
         z-index: 10
-        color: #56E3AF
+
+        .fa
+          padding: 5px
+          color: #56E3AF
+          text-shadow: 2px 2px 3px rgba(0, 0, 0, .5)
+        .fa-search
+          float: right
     .remd
       display: table
       .remd-songs
@@ -286,7 +295,7 @@
                 font-size: 1rem
                 line-height: 1.5
               .singer
-                font-size: .8px
+                font-size: .8rem
                 line-height: 1.5
                 color: #888
                 .sghot
