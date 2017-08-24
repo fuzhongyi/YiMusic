@@ -27,7 +27,7 @@
         </div>
       </div>
     </section>
-    <sticky>
+    <sticky scroll-box="vux_view_box_body" :offset="0">
       <tab :line-width="4" custom-bar-width="60px">
         <tab-item selected>歌曲</tab-item>
       </tab>
@@ -70,7 +70,7 @@
   export default {
     data () {
       return {
-        songSheet: {creator: []},
+        songSheet: {creator: [], coverImgUrl: ''},
         showDesc: false
       }
     },
@@ -219,7 +219,7 @@
               font-size: .9rem
               color: #fefefe
           .intro
-            magrin-bottom: 5px
+            margin-bottom: 5px
             font-size: .8rem
             line-height: 1.5
             display: -webkit-box
@@ -229,7 +229,7 @@
             -webkit-box-orient: vertical
     .sheet-intro
       z-index: 999
-      position: absolute
+      position: fixed
       top: 0
       right: 0
       bottom: 0

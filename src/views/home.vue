@@ -16,7 +16,7 @@
         </swiper-item>
       </swiper>
     </div>
-    <sticky>
+    <sticky scroll-box="vux_view_box_body" :offset="0">
       <tab :line-width="2" custom-bar-width="100px" v-model="index">
         <tab-item selected>推荐音乐</tab-item>
         <tab-item>热歌榜</tab-item>
@@ -225,7 +225,6 @@
         width: 100%
         box-sizing: border-box
         z-index: 10
-
         .fa
           padding: 5px
           color: #56E3AF
@@ -374,7 +373,7 @@
                 font-size: 1rem
                 line-height: 1.5
               .singer
-                font-size: .8px
+                font-size: .8rem
                 line-height: 1.5
                 color: #888
                 .sghot
