@@ -88,6 +88,12 @@
       getSongSheet () {
         const vm = this
         let id = vm.$route.params.id
+        let sheet = sessionStorage.sheet ? JSON.parse(sessionStorage.sheet) : {}
+        if (sheet[id]) {
+          vm.$store.commit('setSongs', sheet[id].tracks)
+          vm.songSheet = sheet[id]
+          return
+        }
         vm.$store.commit('updateLoadingStatus', {isLoading: true})
         vm.axios.post(vm.api.music.playlist, {
           'id': id
@@ -106,7 +112,11 @@
               songList.push(v)
             })
             vm.$store.commit('setSongs', songList)
+            res.data.result.tracks = songList
             vm.songSheet = res.data.result
+            let sheet = sessionStorage.sheet ? JSON.parse(sessionStorage.sheet) : {}
+            sheet[id] = vm.songSheet
+            sessionStorage.sheet = JSON.stringify(sheet)
           }
         }).catch(function () {
           vm.$store.commit('updateLoadingStatus', {isLoading: false})
