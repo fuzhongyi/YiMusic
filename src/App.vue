@@ -12,11 +12,6 @@
               <i class="fa fa-home" aria-hidden="true"></i>
             </div>
           </cell>
-          <cell title="搜索" link="/search" @click.native="drawerVisibility = false">
-            <div slot="icon">
-              <i class="fa fa-search"></i>
-            </div>
-          </cell>
           <cell title="排行榜" link="/rank" @click.native="drawerVisibility = false">
             <div slot="icon">
               <i class="fa fa-bar-chart" aria-hidden="true"></i>
