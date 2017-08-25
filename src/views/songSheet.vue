@@ -23,7 +23,9 @@
             <img class="photo" :src="songSheet.creator.avatarUrl">
             <span class="name">{{songSheet.creator.nickname}}</span>
           </a>
-          <div class="intro" @click="toggleDesc">简介:{{songSheet.description}}</div>
+          <div class="intro" @click="toggleDesc">
+            {{songSheet.description ? '简介:' + songSheet.description : ''}}
+          </div>
         </div>
       </div>
     </section>
