@@ -41,7 +41,7 @@
       width: 150px
       height: 150px
       font-size: 7rem
-      font-weight: lighter
+      font-weight: 300
       text-align: center
       line-height: 150px
       overflow: hidden
