@@ -8,6 +8,14 @@
           <div class="text" v-show="isShowHistory">音乐菜单</div>
         </transition>
         <div class="content">
+          <transition
+            enter-active-class="animated fadeInLeft"
+            leave-active-class="animated hinge">
+            <i class="fa fa-history search-history"
+               :style="{'animation-delay': isShowHistory?'.3s':'.8s'}"
+               v-show="!isShowHistory" @click="showHistory">
+            </i>
+          </transition>
           <input type="text" placeholder="输入你所需要查找的歌曲"
                  v-model="searchKey" @keyup="searchMusic" ref="search">
         </div>
@@ -151,6 +159,10 @@
       chooseHistory (searchKey) {
         this.searchKey = searchKey
         this.getMusic()
+      },
+      showHistory () {
+        this.searchKey = ''
+        this.isFocus = false
       }
     },
     created () {
@@ -164,9 +176,6 @@
       $search.addEventListener('focus', () => {
         this.isFocus = true
       })
-      $search.addEventListener('blur', () => {
-        this.isFocus = false
-      })
     }
   }
 </script>
@@ -179,6 +188,7 @@
       padding: 18px 24px
       background-image: linear-gradient(45deg, #46B3BA, rgba(0, 0, 0, 0))
       transition: all .3s
+      overflow: hidden
       .text
         margin: 20px 0 28px 0
         text-align: center
@@ -186,7 +196,15 @@
         font-weight: lighter
         color: #fff
       .content
+        position: relative
         text-align: center
+        .search-history
+          position: absolute
+          left: 0
+          padding: 0 10px
+          line-height: 34px
+          text-shadow: 0 0 1px rgba(0, 0, 0, .1)
+          color: #FFF
         input
           width: 60%
           font-size: 0.9rem
