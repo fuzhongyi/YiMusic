@@ -66,6 +66,8 @@
 <style lang="stylus" rel="stylesheet/stylus" scoped>
   .music-list
     .music-wrapper
+      .vux-swipeout-button:focus
+        outline: none
       .song-list
         display: flex
         height: 80px
