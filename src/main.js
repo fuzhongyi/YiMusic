@@ -19,28 +19,25 @@ FastClick.attach(document.body)
 Vue.config.productionTip = false
 
 const history = window.sessionStorage
-const sideslipPath = ['/home', '/search', '/rank']
-
 history.clear()
-let historyCount = history.getItem('count') * 1 || 0
+let historyCount = 1
 history.setItem('/', 0)
+history.setItem('/home', 1)
+history.setItem('/rank', 1)
 
 router.beforeEach(function (to, from, next) {
   store.commit('updateLoadingStatus', {isLoading: true})
   const toIndex = history.getItem(to.path)
   const fromIndex = history.getItem(from.path)
-  if (sideslipPath.includes(to.path)) {
-    history.setItem('/', 0)
-  }
   if (toIndex) {
-    if (!fromIndex || parseInt(toIndex, 10) > parseInt(fromIndex, 10) || (toIndex === '0' && fromIndex === '0')) {
+    if (!fromIndex || parseInt(toIndex, 10) >= parseInt(fromIndex, 10)) {
       store.commit('updateDirection', {direction: 'forward'})
     } else {
       store.commit('updateDirection', {direction: 'reverse'})
     }
   } else {
     ++historyCount
-    history.setItem('count', historyCount)
+    history.setItem('/music/play', historyCount + 1)
     to.path !== '/' && history.setItem(to.path, historyCount)
     store.commit('updateDirection', {direction: 'forward'})
   }
