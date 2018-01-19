@@ -23,3 +23,21 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 ### 在线演示
 ***
 [点击预览](https://fuzhongyi.github.io/YiMusic)（请使用chrome开发者手机模式预览）
+
+### 屏幕截图
+
+#### 主页
+
+![](http://p02hf9fn0.bkt.clouddn.com/yi-music/screenshot/home.gif)
+
+#### 搜索
+
+![](http://p02hf9fn0.bkt.clouddn.com/yi-music/screenshot/search.gif)
+
+#### 排行榜
+
+![](http://p02hf9fn0.bkt.clouddn.com/yi-music/screenshot/rank.gif)
+
+#### 播放
+
+![](http://p02hf9fn0.bkt.clouddn.com/yi-music/screenshot/play.gif)
