@@ -24,19 +24,19 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 
 #### 主页
 
-<img src="http://p02hf9fn0.bkt.clouddn.com/yi-music/screenshot/home.gif"/>
+![](https://raw.githubusercontent.com/fuzhongyi/YiMusic/master/screenshot/home.gif)
 
 #### 搜索
 
-<img src="http://p02hf9fn0.bkt.clouddn.com/yi-music/screenshot/search.gif"/>
+![](https://raw.githubusercontent.com/fuzhongyi/YiMusic/master/screenshot/search.gif)
 
 #### 排行榜
 
-<img src="http://p02hf9fn0.bkt.clouddn.com/yi-music/screenshot/rank.gif"/>
+![](https://raw.githubusercontent.com/fuzhongyi/YiMusic/master/screenshot/rank.gif)
 
 #### 播放
 
-<img src="http://p02hf9fn0.bkt.clouddn.com/yi-music/screenshot/play.gif"/>
+![](https://raw.githubusercontent.com/fuzhongyi/YiMusic/master/screenshot/play.gif)
 
 ### 在线演示
 ***
