@@ -1,4 +1,4 @@
-# yimusic
+# Yi Music
 
 > 一起,音乐
 
@@ -20,24 +20,24 @@ npm run build --report
 
 For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
-### 屏幕截图
+## 屏幕截图
 
-#### 主页
+### 主页
 
 ![](https://raw.githubusercontent.com/fuzhongyi/YiMusic/master/screenshot/home.gif)
 
-#### 搜索
+### 搜索
 
 ![](https://raw.githubusercontent.com/fuzhongyi/YiMusic/master/screenshot/search.gif)
 
-#### 排行榜
+### 排行榜
 
 ![](https://raw.githubusercontent.com/fuzhongyi/YiMusic/master/screenshot/rank.gif)
 
-#### 播放
+### 播放
 
 ![](https://raw.githubusercontent.com/fuzhongyi/YiMusic/master/screenshot/play.gif)
 
-### 在线演示
-***
+## 在线演示
+
 [点击预览](https://fuzhongyi.github.io/YiMusic)（请使用chrome开发者手机模式预览）
